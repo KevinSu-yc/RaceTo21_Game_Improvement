@@ -57,7 +57,7 @@ namespace RaceTo21
                 cardTable.ShowPlayers(players);
                 nextTask = Task.AskBet;
             }
-            else if (nextTask == Task.AskBet)
+            else if (nextTask == Task.AskBet) // Bet Feature: Ask players to bet an amount of cash
             {
                 foreach(Player p in players)
                 {
@@ -74,7 +74,6 @@ namespace RaceTo21
                     Card card = deck.DealTopCard();
                     p.cards.Add(card);
                     p.score = ScoreHand(p);
-                    
                 }
                 nextTask = Task.PlayerTurn;
             }
@@ -111,11 +110,12 @@ namespace RaceTo21
                 if (!CheckActivePlayers())
                 {
                     Player winner = DoFinalScoring();
+
+                    // The winner gets the cash from pot
                     cardTable.Pay(winner, currentPot);
                     cardTable.AnnounceWinner(winner, currentPot);
-                    currentPot = 0;
+                    currentPot = 0; // Reset the pot
                     nextTask = Task.CheckForNewGame;
-                    // nextTask = Task.GameOver;
                 }
                 else
                 {
@@ -127,33 +127,36 @@ namespace RaceTo21
                     nextTask = Task.PlayerTurn;
                 }
             }
-            else if (nextTask == Task.CheckForNewGame)
+            else if (nextTask == Task.CheckForNewGame) // Ask the players if they want to keep playing
             {
-                List<Player> newPlayers = new List<Player>(players);
+                List<Player> newPlayers = new List<Player>(players); // copy a temporary list of players to record who wants to keep playing
                 foreach (Player p in players)
                 {
-                    if (!cardTable.AskNewGame(p))
+                    if (!cardTable.AskNewGame(p)) // if the player don't want to keep playing, remove them from the game
                     {
                         newPlayers.Remove(p);
                     }
                 }
                 players = newPlayers;
-                cardTable.ResetPlayers(players);
-                if (players.Count < 1)
+                cardTable.ResetPlayers(players); // reset player's cards, scores, and status
+                if (players.Count < 1) // if no one wants to keep playing, end the game
                 {
                     cardTable.AnnounceWinner(null, -1);
                     nextTask = Task.GameOver;
                 }
-                else if (players.Count == 1)
+                else if (players.Count == 1) // if only one player wants to keep playing, the player become winner right away
                 {
                     cardTable.AnnounceWinner(players[0], -1);
                     nextTask = Task.GameOver;
                 }
                 else
                 {
+                    // Reset the variable and the deck for next game
                     currentPlayer = 0;
                     deck = new Deck();
                     deck.Shuffle();
+
+                    // Rearrange the order of the players in the player list
                     Random rng = new Random();
                     for (int i = 0; i < players.Count; i++)
                     {

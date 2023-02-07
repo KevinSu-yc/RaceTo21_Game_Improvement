@@ -60,6 +60,10 @@ namespace RaceTo21
             return response;
         }
 
+        /* get bet from player accoring to their input
+         * called by Game object
+         * returns the amount of bet if it's valid
+         */
         public int CollectBet(Player player)
         {
             while(true)
@@ -89,6 +93,9 @@ namespace RaceTo21
             }
         }
 
+        /* Pay the player from the pot
+         * Called by Game object
+         */
         public void Pay(Player player, int cashAmount)
         {
             player.cash += cashAmount;
@@ -115,6 +122,10 @@ namespace RaceTo21
             }
         }
 
+        /* Ask each player if they want to keep playing
+         * Called by Game object
+         * Return a bool represent whether the player wants to keep playing
+         */
         public bool AskNewGame(Player player)
         {
             if (player.cash <= 0)
