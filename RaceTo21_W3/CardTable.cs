@@ -125,7 +125,7 @@ namespace RaceTo21
 
             while (true)
             {
-                Console.Write(player.name + ", do you want to keep playing? (Y/N)");
+                Console.Write($"{player.name} , do you want to keep playing (cash: {player.cash}$)? (Y/N)");
                 string response = Console.ReadLine();
                 if (response.ToUpper().StartsWith("Y"))
                 {
