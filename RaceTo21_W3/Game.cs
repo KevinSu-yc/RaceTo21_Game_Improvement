@@ -59,6 +59,11 @@ namespace RaceTo21
             }
             else if (nextTask == Task.AskBet)
             {
+                foreach(Player p in players)
+                {
+                    currentPot += cardTable.CollectBet(p);
+                }
+                Console.WriteLine("The total amount in pot is:" + currentPot);
                 nextTask = Task.OfferFirstCard;
             }
             else if (nextTask == Task.OfferFirstCard) // Force to give every player a card at the beginning
@@ -106,7 +111,9 @@ namespace RaceTo21
                 if (!CheckActivePlayers())
                 {
                     Player winner = DoFinalScoring();
-                    cardTable.AnnounceWinner(winner);
+                    cardTable.Pay(winner, currentPot);
+                    cardTable.AnnounceWinner(winner, currentPot);
+                    currentPot = 0;
                     nextTask = Task.CheckForNewGame;
                     // nextTask = Task.GameOver;
                 }
@@ -134,12 +141,12 @@ namespace RaceTo21
                 cardTable.ResetPlayers(players);
                 if (players.Count < 1)
                 {
-                    cardTable.AnnounceWinner(null);
+                    cardTable.AnnounceWinner(null, -1);
                     nextTask = Task.GameOver;
                 }
                 else if (players.Count == 1)
                 {
-                    cardTable.AnnounceWinner(players[0]);
+                    cardTable.AnnounceWinner(players[0], -1);
                     nextTask = Task.GameOver;
                 }
                 else

@@ -31,7 +31,7 @@ namespace RaceTo21
         {
             if (betAmount > cash)
             {
-				return 0;
+				return -1;
             }
 
 			cash -= betAmount;

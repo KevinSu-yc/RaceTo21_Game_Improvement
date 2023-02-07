@@ -60,6 +60,40 @@ namespace RaceTo21
             return response;
         }
 
+        public int CollectBet(Player player)
+        {
+            while(true)
+            {
+                Console.Write(player.name + ", how much do you want to bet? ");
+                string response = Console.ReadLine();
+                if (int.TryParse(response, out int betAmount))
+                {
+                    int collectedBet = player.bet(betAmount);
+                    if (collectedBet > 0)
+                    {
+                        return collectedBet;
+                    }
+                    else if (collectedBet == 0)
+                    {
+                        Console.WriteLine("You have to bet an amount.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Your cash: " + player.cash + " is not enough.");
+                    }
+                } 
+                else
+                {
+                    Console.WriteLine("Please enter a valid number.");
+                }
+            }
+        }
+
+        public void Pay(Player player, int cashAmount)
+        {
+            player.cash += cashAmount;
+        }
+
         public bool OfferACard(Player player)
         {
             while (true)
@@ -83,6 +117,12 @@ namespace RaceTo21
 
         public bool AskNewGame(Player player)
         {
+            if (player.cash <= 0)
+            {
+                Console.WriteLine(player.name + ", you don't have enough cash for the next game.");
+                return false;
+            }
+
             while (true)
             {
                 Console.Write(player.name + ", do you want to keep playing? (Y/N)");
@@ -136,11 +176,11 @@ namespace RaceTo21
             }
         }
 
-        public void AnnounceWinner(Player player)
+        public void AnnounceWinner(Player player, int winAmount)
         {
             if (player != null)
             {
-                Console.WriteLine(player.name + " wins!");
+                Console.WriteLine(winAmount > 0 ? $"{player.name} wins {winAmount}$!" : $"{player.name} wins!");
             }
             else
             {
@@ -158,11 +198,6 @@ namespace RaceTo21
                 player.status = PlayerStatus.active;
                 player.score = 0;
             }
-        }
-
-        public void Pay(Player player, int cashAmount)
-        {
-            player.cash += cashAmount;
         }
     }
 }
