@@ -9,7 +9,7 @@ namespace RaceTo21
 		public List<Card> cards = new List<Card>();
 		public PlayerStatus status = PlayerStatus.active;
 		public int score;
-		public int cash = 100;
+		public int cash = 100; // Set a default value for player to have at the beginning
 
 		public Player(string n)
 		{
@@ -29,7 +29,7 @@ namespace RaceTo21
 		 */
 		public int bet(int betAmount)
         {
-            if (betAmount > cash)
+            if (betAmount > cash) // if a player can't afford the betAmount, don't subtract the amount from player's cash
             {
 				return -1;
             }
