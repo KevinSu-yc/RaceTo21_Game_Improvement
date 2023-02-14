@@ -60,6 +60,21 @@ namespace RaceTo21
             return response;
         }
 
+        public int GetTimesToWin()
+        {
+            Console.Write("How many times do a player have to win?(3 ~ 6 times) ");
+            string response = Console.ReadLine();
+            int times;
+            while (int.TryParse(response, out times) == false
+                || times < 3 || times > 6)
+            {
+                Console.WriteLine("Invalid number of times.");
+                Console.Write("How many times do a player have to win?(3 ~ 6 times) ");
+                response = Console.ReadLine();
+            }
+            return times;
+        }
+
         /* get bet from player accoring to their input
          * called by Game object
          * returns the amount of bet if it's valid
@@ -136,7 +151,7 @@ namespace RaceTo21
 
             while (true)
             {
-                Console.Write($"{player.name} , do you want to keep playing (cash: {player.cash}$)? (Y/N)");
+                Console.Write($"{player.name} , do you want to keep playing (cash: {player.cash}$, wins: {player.wins})? (Y/N)");
                 string response = Console.ReadLine();
                 if (response.ToUpper().StartsWith("Y"))
                 {
@@ -197,6 +212,13 @@ namespace RaceTo21
             {
                 Console.WriteLine("No more players!");
             }
+            Console.Write("Press <Enter> to continue... ");
+            while (Console.ReadKey().Key != ConsoleKey.Enter) { }
+        }
+
+        public void AnnounceFinalWinner(Player player)
+        {
+            Console.WriteLine($"{player.name} is the final winner by winning {player.wins} times");
             Console.Write("Press <Enter> to continue... ");
             while (Console.ReadKey().Key != ConsoleKey.Enter) { }
         }

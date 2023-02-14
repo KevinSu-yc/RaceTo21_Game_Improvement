@@ -11,6 +11,7 @@ namespace RaceTo21
         Deck deck = new Deck(); // deck of cards
         int currentPlayer = 0; // current player on list
         int currentPot = 0; // amount of bet put in current pot
+        int timesToWin = 3; 
         public Task nextTask; // keeps track of game state
         private bool cheating = false; // lets you cheat for testing purposes if true
 
@@ -18,7 +19,7 @@ namespace RaceTo21
         {
             cardTable = c;
             deck.Shuffle();
-            deck.ShowAllCards();
+            // deck.ShowAllCards();
             nextTask = Task.GetNumberOfPlayers;
         }
 
@@ -41,6 +42,12 @@ namespace RaceTo21
             if (nextTask == Task.GetNumberOfPlayers)
             {
                 numberOfPlayers = cardTable.GetNumberOfPlayers();
+                nextTask = Task.AskTimesToWin;
+            }
+            else if (nextTask == Task.AskTimesToWin)
+            {
+                timesToWin = cardTable.GetTimesToWin();
+                Console.WriteLine($"Player who wins {timesToWin} times will be the final winner");
                 nextTask = Task.GetNames;
             }
             else if (nextTask == Task.GetNames)
@@ -111,7 +118,8 @@ namespace RaceTo21
                 {
                     Player winner = DoFinalScoring();
 
-                    // The winner gets the cash from pot
+                    // The winner gets the cash from pot and gets a win
+                    winner.wins++;
                     cardTable.Pay(winner, currentPot);
                     cardTable.AnnounceWinner(winner, currentPot);
                     currentPot = 0; // Reset the pot
@@ -130,42 +138,57 @@ namespace RaceTo21
             else if (nextTask == Task.CheckForNewGame) // Ask the players if they want to keep playing
             {
                 List<Player> newPlayers = new List<Player>(players); // copy a temporary list of players to record who wants to keep playing
+                Player finalWinner = new Player(null);
                 foreach (Player p in players)
                 {
+                    if (p.wins == timesToWin)
+                    {
+                        finalWinner = p;
+                        break;
+                    }
                     if (!cardTable.AskNewGame(p)) // if the player don't want to keep playing, remove them from the game
                     {
                         newPlayers.Remove(p);
                     }
                 }
-                players = newPlayers;
-                cardTable.ResetPlayers(players); // reset player's cards, scores, and status
-                if (players.Count < 1) // if no one wants to keep playing, end the game
-                {
-                    cardTable.AnnounceWinner(null, -1);
-                    nextTask = Task.GameOver;
-                }
-                else if (players.Count == 1) // if only one player wants to keep playing, the player become winner right away
-                {
-                    cardTable.AnnounceWinner(players[0], -1);
-                    nextTask = Task.GameOver;
-                }
-                else
-                {
-                    // Reset the variable and the deck for next game
-                    currentPlayer = 0;
-                    deck = new Deck();
-                    deck.Shuffle();
 
-                    // Rearrange the order of the players in the player list
-                    Random rng = new Random();
-                    for (int i = 0; i < players.Count; i++)
+                if (finalWinner.name == null)
+                {
+                    players = newPlayers;
+                    cardTable.ResetPlayers(players); // reset player's cards, scores, and status
+                    if (players.Count < 1) // if no one wants to keep playing, end the game
                     {
-                        Player tmp = players[i];
-                        int swapindex = rng.Next(players.Count);
-                        players[i] = players[swapindex];
-                        players[swapindex] = tmp;
+                        cardTable.AnnounceWinner(null, -1);
+                        nextTask = Task.GameOver;
                     }
-                    nextTask = Task.IntroducePlayers;
+                    else if (players.Count == 1) // if only one player wants to keep playing, the player become winner right away
+                    {
+                        cardTable.AnnounceWinner(players[0], -1);
+                        nextTask = Task.GameOver;
+                    }
+                    else
+                    {
+                        // Reset the variable and the deck for next game
+                        currentPlayer = 0;
+                        deck = new Deck();
+                        deck.Shuffle();
+
+                        // Rearrange the order of the players in the player list
+                        Random rng = new Random();
+                        for (int i = 0; i < players.Count; i++)
+                        {
+                            Player tmp = players[i];
+                            int swapindex = rng.Next(players.Count);
+                            players[i] = players[swapindex];
+                            players[swapindex] = tmp;
+                        }
+                        nextTask = Task.IntroducePlayers;
+                    }
+                }
+                else 
+                {
+                    cardTable.AnnounceFinalWinner(finalWinner);
+                    nextTask = Task.GameOver;
                 }
             }
             else // we shouldn't get here...

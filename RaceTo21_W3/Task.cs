@@ -6,6 +6,7 @@ namespace RaceTo21
 		GetNumberOfPlayers,
 		GetNames,
 		IntroducePlayers,
+		AskTimesToWin,
 		AskBet,
 		OfferFirstCard,
 		PlayerTurn,

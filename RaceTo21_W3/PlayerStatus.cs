@@ -6,7 +6,8 @@ namespace RaceTo21
 		active,
 		stay,
 		bust,
-		win
+		win,
+		quit
 	}
 }
 

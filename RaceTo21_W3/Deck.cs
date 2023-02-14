@@ -11,7 +11,7 @@ namespace RaceTo21
 
         public Deck()
         {
-            Console.WriteLine("*********** Building deck...");
+            Console.WriteLine("Building Deck...");
             string[] suits = { "Spades", "Hearts", "Clubs", "Diamonds" };
 
             for (int cardVal = 1; cardVal <= 13; cardVal++)
@@ -77,7 +77,6 @@ namespace RaceTo21
          * shuffling method(s) worked! And normally we want our card 
          * table to do all of the displaying, don't we?!
          */
-
         public void ShowAllCards()
         {
             for (int i = 0; i < cards.Count; i++)

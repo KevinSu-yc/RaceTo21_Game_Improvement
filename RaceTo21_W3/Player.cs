@@ -10,6 +10,7 @@ namespace RaceTo21
 		public PlayerStatus status = PlayerStatus.active;
 		public int score;
 		public int cash = 100; // Set a default value for player to have at the beginning
+		public int wins = 0;
 
 		public Player(string n)
 		{
@@ -21,7 +22,7 @@ namespace RaceTo21
 		 */
 		public void Introduce(int playerNum)
 		{
-			Console.WriteLine("Hello, my name is " + name + " and I am player #" + playerNum + $"(Cash: {cash}$)");
+			Console.WriteLine("Hello, my name is " + name + " and I am player #" + playerNum + $"(Cash: {cash}$, Wins: {wins})");
 		}
 
 		/* Bets an amount from player's cash
