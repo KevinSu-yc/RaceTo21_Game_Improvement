@@ -6,52 +6,62 @@ namespace RaceTo21
 {
     public class Deck
     {
-        List<Card> cards = new List<Card>();
-        public Dictionary<string, string> cardImageName = new Dictionary<string, string>();
+        // The cards and the image file names shouldn't be changed without using specific methods in Deck object so I set them to private.
+        private List<Card> cards = new List<Card>(); // All the cards in the deck
+        private Dictionary<string, string> cardImageName = new Dictionary<string, string>(); // A dictionary that helps get an image file name for a card according to it's short name
 
+        /// <summary>
+        /// Represents a Deck that inlcudes 52 Cards.
+        /// </summary>
         public Deck()
         {
-            Console.WriteLine("*********** Building deck...");
+            Console.WriteLine("Building Deck...");
             string[] suits = { "Spades", "Hearts", "Clubs", "Diamonds" };
 
             for (int cardVal = 1; cardVal <= 13; cardVal++)
             {
                 foreach (string cardSuit in suits)
                 {
-                    string cardName;
-                    string cardImgNumber;
+                    string cardValName; // a card value waited to be modified for forming card names
+                    string cardImgNumber; // a card valeu waited to be modified for forming card image file names
                     switch (cardVal)
                     {
                         case 1:
-                            cardName = "Ace";
-                            cardImgNumber = cardName.Substring(0,1);
+                            cardValName = "Ace";
+                            // Substring(x, y) returns a y letters long string starts from the x letter of the original string (the first letter's index is 0)
+                            cardImgNumber = cardValName.Substring(0,1); // if the card value name is not a number, get it's first letter for image file name
                             break;
                         case 11:
-                            cardName = "Jack";
-                            cardImgNumber = cardName.Substring(0, 1);
+                            cardValName = "Jack";
+                            cardImgNumber = cardValName.Substring(0, 1);
                             break;
                         case 12:
-                            cardName = "Queen";
-                            cardImgNumber = cardName.Substring(0, 1);
+                            cardValName = "Queen";
+                            cardImgNumber = cardValName.Substring(0, 1);
                             break;
                         case 13:
-                            cardName = "King";
-                            cardImgNumber = cardName.Substring(0, 1);
+                            cardValName = "King";
+                            cardImgNumber = cardValName.Substring(0, 1);
                             break;
                         default:
-                            cardName = cardVal.ToString();
-                            cardImgNumber = cardVal.ToString().PadLeft(2, '0');
+                            cardValName = cardVal.ToString();
+                            cardImgNumber = cardVal.ToString().PadLeft(2, '0'); // if the card value name is a number, place a 0 before the value if it's not 2-digit, ex: 7 -> 07
                             break;
                     }
-                    string shortCardName = (cardName == "10") ? "10" : cardName.Substring(0,1);
-                    cards.Add(new Card($"{shortCardName}{cardSuit.Substring(0, 1)}", $"{cardName} of {cardSuit}"));
 
-                    // dictionary for card image file names
+                    // If the card value is 10, don't modify, otherwise, get the first digit/letter for a short name
+                    string shortCardName = (cardValName == "10") ? "10" : cardValName.Substring(0,1);
+                    cards.Add(new Card($"{shortCardName}{cardSuit.Substring(0, 1)}", $"{cardValName} of {cardSuit}")); // Also only use the first letter of the card suit for the short name
+
+                    // dictionary for card image file names, the key uses the short name of the card
                     cardImageName[$"{shortCardName}{cardSuit.Substring(0, 1)}"] = $"card_{cardSuit.ToLower()}_{cardImgNumber}.png";
                 }
             }
         }
 
+        /// <summary>
+        /// Shuffles the deck into a random order. Called by Game object.
+        /// </summary>
         public void Shuffle()
         {
             Console.WriteLine("Shuffling Cards...");
@@ -72,12 +82,9 @@ namespace RaceTo21
             }
         }
 
-        /* Maybe we can make a variation on this that's more useful,
-         * but at the moment it's just really to confirm that our 
-         * shuffling method(s) worked! And normally we want our card 
-         * table to do all of the displaying, don't we?!
-         */
-
+        /// <summary>
+        /// Prints the information of all the cards on the Console. Called for checking the deck is built successfully.
+        /// </summary>
         public void ShowAllCards()
         {
             for (int i = 0; i < cards.Count; i++)
@@ -92,21 +99,16 @@ namespace RaceTo21
                     Console.WriteLine("");
                 }
             }
-
-            /*
-            foreach(string img in cardImageName.Values) // print card image file names with dictionary
-            {
-                Console.WriteLine(img);
-            }
-            */
-
         }
 
+        /// <summary>
+        /// Deals the first card from the Deck's Card list. Called by Game object.
+        /// </summary>
+        /// <returns>Returns the Card object removed from the Deck</returns>
         public Card DealTopCard()
         {
             Card card = cards[cards.Count - 1];
             cards.RemoveAt(cards.Count - 1);
-            // Console.WriteLine("I'm giving you " + card);
             return card;
         }
     }

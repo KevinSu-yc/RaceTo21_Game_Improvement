@@ -1,12 +1,16 @@
 ﻿using System;
 namespace RaceTo21
 {
+	/// <summary>
+	/// Represents different status of a player in the game
+	/// </summary>
 	public enum PlayerStatus
 	{
-		active,
-		stay,
-		bust,
-		win
+		active, // is able to keep getting cards
+		stay, // decided not to keep getting cards
+		bust, // the score in hand is over 21
+		win, // won a game
+		quit, // left the game
 	}
 }
 
