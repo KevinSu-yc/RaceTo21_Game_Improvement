@@ -1,6 +1,9 @@
 ﻿using System;
 namespace RaceTo21
 {
+	/// <summary>
+	/// Represents different phase of the game
+	/// </summary>
 	public enum Task
 	{
 		GetNumberOfPlayers,
