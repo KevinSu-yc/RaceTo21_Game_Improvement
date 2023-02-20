@@ -5,7 +5,7 @@ namespace RaceTo21
 {
 	public class Player
 	{
-		public string name { get; private set; } // I don't want players' name to be changed during the game
+		public string Name { get; private set; } // I don't want players' name to be changed during the game
 		public List<Card> cards = new List<Card>(); // The cards in the player's hands
 		public PlayerStatus status = PlayerStatus.active; // Whether the player wants to keep playing, or if the player is able to keep playing
 		public int score; // The score calculated by the cards in the player's hands
@@ -18,7 +18,7 @@ namespace RaceTo21
 		/// <param name="n">The player's name</param>
 		public Player(string n)
 		{
-			name = n;
+			Name = n;
         }
 
 		/// <summary>
@@ -27,7 +27,7 @@ namespace RaceTo21
 		/// <param name="playerNum">The order number of the player</param>
 		public void Introduce(int playerNum)
 		{
-			Console.WriteLine("Hello, my name is " + name + " and I am player #" + playerNum + $"(Cash: ${cash}, Wins: {wins})");
+			Console.WriteLine("Hello, my name is " + Name + " and I am player #" + playerNum + $"(Cash: ${cash}, Wins: {wins})");
 		}
 
 		/// <summary>
@@ -35,7 +35,7 @@ namespace RaceTo21
 		/// </summary>
 		/// <param name="betAmount">The amount of cash to bet</param>
 		/// <returns>Returns the bet amount if the player can afford it, otherwise, return -1</returns>
-		public int bet(int betAmount)
+		public int Bet(int betAmount)
         {
             if (betAmount > cash) // if a player can't afford the betAmount, don't subtract the amount from player's cash
             {

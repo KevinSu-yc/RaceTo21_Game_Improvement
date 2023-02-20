@@ -108,11 +108,11 @@ namespace RaceTo21
                 // Keep asking until the input is valid
                 while (true)
                 {
-                    Console.Write(p.name + ", how much do you want to bet? $");
+                    Console.Write(p.Name + ", how much do you want to bet? $");
                     string response = Console.ReadLine();
                     if (int.TryParse(response, out int betAmount))
                     {
-                        int collectedBet = p.bet(betAmount); // Calls Player.bet to get the the bet amount if it's affordable
+                        int collectedBet = p.Bet(betAmount); // Calls Player.bet to get the the bet amount if it's affordable
                         if (collectedBet > 0) // If collected bet is greater than zero, it's valid
                         {
                             pot += collectedBet * 2; // I decided to set the pot to twice amount of the players' bet
@@ -147,7 +147,7 @@ namespace RaceTo21
             // Keep asking until the player enter a valid input
             while (true)
             {
-                Console.Write(player.name + ", do you want a card? (Y/N)");
+                Console.Write(player.Name + ", do you want a card? (Y/N)");
                 string response = Console.ReadLine();
                 if (response.ToUpper().StartsWith("Y")) // If gets Y/y
                 {
@@ -173,14 +173,14 @@ namespace RaceTo21
         {
             if (player.cash <= 0) // Don't have to ask if the palyer don't have enough cash for the next game
             {
-                Console.WriteLine(player.name + ", you don't have enough cash for the next game.");
+                Console.WriteLine(player.Name + ", you don't have enough cash for the next game.");
                 return false;
             }
 
             // Keep asking until the player enter a valid input
             while (true)
             {
-                Console.Write($"{player.name} , do you want to keep playing (cash: ${player.cash}, wins: {player.wins})? (Y/N)");
+                Console.Write($"{player.Name} , do you want to keep playing (cash: ${player.cash}, wins: {player.wins})? (Y/N)");
                 string response = Console.ReadLine();
                 if (response.ToUpper().StartsWith("Y")) // If gets Y/y
                 {
@@ -205,12 +205,12 @@ namespace RaceTo21
         {
             if (player.cards.Count > 0) // If the player have more than 1 cards
             {
-                Console.Write(player.name + " has: ");
+                Console.Write(player.Name + " has: ");
 
                 // Show full names of cards as a comma-separated list
                 for (int i = 0; i < player.cards.Count; i++)
                 {
-                    Console.Write(player.cards[i].displayName);
+                    Console.Write(player.cards[i].DisplayName);
                     Console.Write((i == player.cards.Count - 1) ? " " : ", "); // if it's the last card, don't add a comma after it
                 }
                 Console.Write("= " + player.score + "/21 ");
@@ -243,7 +243,7 @@ namespace RaceTo21
         /// <param name="winAmount">The amount of cash the winner </param>
         public void AnnounceWinner(Player player, int winAmount)
         {
-            Console.WriteLine($"{player.name} wins ${winAmount}!");
+            Console.WriteLine($"{player.Name} wins ${winAmount}!");
             Console.Write("Press <Enter> to continue... ");
             while (Console.ReadKey().Key != ConsoleKey.Enter) { }
         }
@@ -260,10 +260,10 @@ namespace RaceTo21
             switch (endReasonCode)
             {
                 case 1: // Someone wins the amount of time set at the beginning
-                    Console.WriteLine($"{endGamePlayer.name} ends the game by winning {endGamePlayer.wins} times...");
+                    Console.WriteLine($"{endGamePlayer.Name} ends the game by winning {endGamePlayer.wins} times...");
                     break;
                 case 2: // Only 1 player who doesn't leave the game still has cash
-                    Console.WriteLine($"Game's over because {endGamePlayer.name} is the only player who hasn't quit and still has cash...");
+                    Console.WriteLine($"Game's over because {endGamePlayer.Name} is the only player who hasn't quit and still has cash...");
                     break;
                 default: // No enough players
                     Console.WriteLine("================================");
@@ -279,16 +279,16 @@ namespace RaceTo21
              * if the cash is same, uses ThenByDescending(player => player.wins) to keep ordering the players according to their times of win from most to least,
              * if both above are the same, uses ThenBy(player => player.name) to keep ordering the players according to their names alphebatically.
              */
-            List<Player> rankedPlayers = players.OrderByDescending(player => player.cash).ThenByDescending(player => player.wins).ThenBy(player => player.name).ToList();
+            List<Player> rankedPlayers = players.OrderByDescending(player => player.cash).ThenByDescending(player => player.wins).ThenBy(player => player.Name).ToList();
 
             // The first player in the ranked list must be the final winner because of winning the most cash
-            Console.WriteLine($"\n*** {rankedPlayers[0].name} is the final winner by winning ${rankedPlayers[0].cash}!! ***");
+            Console.WriteLine($"\n*** {rankedPlayers[0].Name} is the final winner by winning ${rankedPlayers[0].cash}!! ***");
 
             Console.WriteLine("\n---------- Rank ------------");          
             for (int i = 0; i < rankedPlayers.Count; i++) // Print all the players according the rank order: cash -> wins -> player name
             {
                 Player p = rankedPlayers[i];
-                Console.WriteLine($"{i + 1} - {p.name} (cash: ${p.cash}, wins: {p.wins})");
+                Console.WriteLine($"{i + 1} - {p.Name} (cash: ${p.cash}, wins: {p.wins})");
                 
             }
             Console.WriteLine("\n(* Rank order: cash -> wins -> player name *)");

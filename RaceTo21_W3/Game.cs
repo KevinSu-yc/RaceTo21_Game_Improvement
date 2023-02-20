@@ -13,13 +13,13 @@ namespace RaceTo21
         private bool cheating = false; // lets you cheat for testing purposes if true
 
         // These fields should be read-only outside of Game object so other classes can't affect the game process.
-        public List<Player> players { get; private set; } = new List<Player>(); // list of objects containing player data
-        public Deck deck { get; private set; } = new Deck(); // deck of cards
-        public int numberOfPlayers { get; private set; } // number of players in current game
-        public int currentPlayer { get; private set; } = 0; // current player on list
-        public int currentPot { get; private set; } = 0; // amount of bet put in current pot
-        public int timesToWin { get; private set; } = 3;
-        public Task nextTask { get; private set; } // keeps track of game state
+        public List<Player> Players { get; private set; } = new List<Player>(); // list of objects containing player data
+        public Deck Deck { get; private set; } = new Deck(); // deck of cards
+        public int NumberOfPlayers { get; private set; } // number of players in current game
+        public int CurrentPlayer { get; private set; } = 0; // current player on list
+        public int CurrentPot { get; private set; } = 0; // amount of bet put in current pot
+        public int TimesToWin { get; private set; } = 3;
+        public Task NextTask { get; private set; } // keeps track of game state
 
         /// <summary>
         /// Sets up the card table and suffle the deck while creaing the game. Initiated the task to starts the game process.
@@ -29,9 +29,9 @@ namespace RaceTo21
         public Game(CardTable c)
         {
             cardTable = c;
-            deck.Shuffle();
+            Deck.Shuffle();
             // deck.ShowAllCards();
-            nextTask = Task.GetNumberOfPlayers;
+            NextTask = Task.GetNumberOfPlayers;
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace RaceTo21
         /// <param name="n">Names for creating a Player object</param>
         public void AddPlayer(string n)
         {
-            players.Add(new Player(n));
+            Players.Add(new Player(n));
         }
 
         /// <summary>
@@ -50,23 +50,23 @@ namespace RaceTo21
         public void DoNextTask()
         {
             CardTable.WriteCardTableMessage("================================"); // Devider that seperates each phase of the game
-            if (nextTask == Task.GetNumberOfPlayers) // Gets the number of players that are joining the game
+            if (NextTask == Task.GetNumberOfPlayers) // Gets the number of players that are joining the game
             {
-                numberOfPlayers = cardTable.GetNumberOfPlayers(); 
-                nextTask = Task.AskTimesToWin;
+                NumberOfPlayers = cardTable.GetNumberOfPlayers(); 
+                NextTask = Task.AskTimesToWin;
             }
-            else if (nextTask == Task.AskTimesToWin) // Gets the amount of times that players have to win to end the game
+            else if (NextTask == Task.AskTimesToWin) // Gets the amount of times that players have to win to end the game
             {
-                timesToWin = cardTable.GetTimesToWin();
-                nextTask = Task.GetNames;
+                TimesToWin = cardTable.GetTimesToWin();
+                NextTask = Task.GetNames;
             }
-            else if (nextTask == Task.GetNames) // Gets the names for every player
+            else if (NextTask == Task.GetNames) // Gets the names for every player
             {
-                for (int count = 1; count <= numberOfPlayers; count++)
+                for (int count = 1; count <= NumberOfPlayers; count++)
                 {
                     string name = cardTable.GetPlayerName(count);
 
-                    if (players.Find(p => p.name == name) != null) // If there's a player in the player list has the same name as the current input
+                    if (Players.Find(p => p.Name == name) != null) // If there's a player in the player list has the same name as the current input
                     {
                         CardTable.WriteCardTableMessage("The name is used.");
                         count--; // count minus 1 to repeat this iteration, ask for input until the name is unique
@@ -76,45 +76,45 @@ namespace RaceTo21
                         AddPlayer(name); // NOTE: player list will start from 0 index even though we use 1 for our count here to make the player numbering more human-friendly
                     }
                 }
-                nextTask = Task.IntroducePlayers;
+                NextTask = Task.IntroducePlayers;
             }
-            else if (nextTask == Task.IntroducePlayers) // Prints out the information of the player that is still playing
+            else if (NextTask == Task.IntroducePlayers) // Prints out the information of the player that is still playing
             {
-                cardTable.ShowPlayers(players.FindAll(player => player.status != PlayerStatus.quit)); // Uses players.FindAll() to get the players who haven't quit
-                nextTask = Task.AskBet;
+                cardTable.ShowPlayers(Players.FindAll(player => player.status != PlayerStatus.quit)); // Uses players.FindAll() to get the players who haven't quit
+                NextTask = Task.AskBet;
             }
-            else if (nextTask == Task.AskBet) // Asks players to bet an amount of cash
+            else if (NextTask == Task.AskBet) // Asks players to bet an amount of cash
             {
-                currentPot = cardTable.CollectBet(players.FindAll(player => player.status != PlayerStatus.quit)); // Asks and collect cash from the players who haven't quit
-                nextTask = Task.OfferFirstCard;
+                CurrentPot = cardTable.CollectBet(Players.FindAll(player => player.status != PlayerStatus.quit)); // Asks and collect cash from the players who haven't quit
+                NextTask = Task.OfferFirstCard;
             }
-            else if (nextTask == Task.OfferFirstCard) // Forces to give every player a card at the beginning
+            else if (NextTask == Task.OfferFirstCard) // Forces to give every player a card at the beginning
             {
                 CardTable.WriteCardTableMessage("Giving the players their first card..."); // This is same as Console.WriteLine() but I want it to be more like the card table is showing the message
                 
-                foreach (Player p in players.FindAll(player => player.status != PlayerStatus.quit)) // Loop through the players who haven't quit 
+                foreach (Player p in Players.FindAll(player => player.status != PlayerStatus.quit)) // Loop through the players who haven't quit 
                 {
                     // offer a card to each player and calculate the score
-                    Card card = deck.DealTopCard();
+                    Card card = Deck.DealTopCard();
                     p.cards.Add(card);
                     p.score = ScoreHand(p);
                 }
-                nextTask = Task.PlayerTurn;
+                NextTask = Task.PlayerTurn;
             }
-            else if (nextTask == Task.PlayerTurn) // Check players actions in their turns
+            else if (NextTask == Task.PlayerTurn) // Check players actions in their turns
             {
                 // Get the current player by the position from the players who haven't quit
-                Player player = players.FindAll(player => player.status != PlayerStatus.quit)[currentPlayer];
+                Player player = Players.FindAll(player => player.status != PlayerStatus.quit)[CurrentPlayer];
 
                 if (player.status == PlayerStatus.active) // If the player can still get a card, ask if they want to
                 {
                     // Show every player's cards to help the current player decides if they want to get a card
-                    cardTable.ShowHands(players.FindAll(player => player.status != PlayerStatus.quit));
+                    cardTable.ShowHands(Players.FindAll(player => player.status != PlayerStatus.quit));
 
                     if (cardTable.OfferACard(player)) // If the player wants to get a card
                     {
                         // Offer a card from the Deck to the player and calculate the scores
-                        Card card = deck.DealTopCard();
+                        Card card = Deck.DealTopCard();
                         player.cards.Add(card);
                         player.score = ScoreHand(player);
 
@@ -131,63 +131,63 @@ namespace RaceTo21
                     else // If the player doesn't want a card, set their status as stay
                     {
                         player.status = PlayerStatus.stay;
-                        CardTable.WriteCardTableMessage($"{player.name} decides to stay...");
+                        CardTable.WriteCardTableMessage($"{player.Name} decides to stay...");
                     }
                 }
                 else // If the player is busted or chose to stay in their previous turn
                 {
                     // Don't print out every player and just show a message about skipping the player's turn
-                    CardTable.WriteCardTableMessage($"Skipping {player.name}'s turn({player.status.ToString().ToUpper()})...");
+                    CardTable.WriteCardTableMessage($"Skipping {player.Name}'s turn({player.status.ToString().ToUpper()})...");
                 }
 
-                currentPlayer++; // add 1 to currentPlayer to get to the next player's position
-                if (currentPlayer > players.FindAll(player => player.status != PlayerStatus.quit).Count - 1)
+                CurrentPlayer++; // add 1 to currentPlayer to get to the next player's position
+                if (CurrentPlayer > Players.FindAll(player => player.status != PlayerStatus.quit).Count - 1)
                 {
-                    currentPlayer = 0; // back to the first player who hasn't quit the game
+                    CurrentPlayer = 0; // back to the first player who hasn't quit the game
                 }
 
-                nextTask = Task.CheckForEnd;
+                NextTask = Task.CheckForEnd;
             }
-            else if (nextTask == Task.CheckForEnd) // After every player's turn, check if there's a winner occurs
+            else if (NextTask == Task.CheckForEnd) // After every player's turn, check if there's a winner occurs
             {
                 if (CheckWinner()) // If there is a winner
                 {
                     // Determine whose the winner from the players who hasn't quit
-                    Player winner = DoFinalScoring(players.FindAll(player => player.status != PlayerStatus.quit));
+                    Player winner = DoFinalScoring(Players.FindAll(player => player.status != PlayerStatus.quit));
 
                     // The winner gets the cash from pot and gets a win
                     winner.wins++;
-                    Pay(winner, currentPot);
+                    Pay(winner, CurrentPot);
 
                     // The card table announce the winner for the current round and how much they win
-                    cardTable.AnnounceWinner(winner, currentPot);
-                    currentPot = 0; // Reset the pot
+                    cardTable.AnnounceWinner(winner, CurrentPot);
+                    CurrentPot = 0; // Reset the pot
 
-                    nextTask = Task.CheckForNewGame;
+                    NextTask = Task.CheckForNewGame;
                 }
                 else // If there's no winner yet
                 {
                     CardTable.WriteCardTableMessage("Next player...");
-                    nextTask = Task.PlayerTurn; // return to player turn phase
+                    NextTask = Task.PlayerTurn; // return to player turn phase
                 }
             }
-            else if (nextTask == Task.CheckForNewGame) // After a winner for a round appears, ask players if they want to keep playing
+            else if (NextTask == Task.CheckForNewGame) // After a winner for a round appears, ask players if they want to keep playing
             {
                 // If there is only 1 player who havn't left the game still have cash
-                if (players.FindAll(player => player.status != PlayerStatus.quit).FindAll(player => player.cash > 0).Count == 1) 
+                if (Players.FindAll(player => player.status != PlayerStatus.quit).FindAll(player => player.cash > 0).Count == 1) 
                 {
                     // Card table announce the player who wins the most cash as the final winner
                     // (case 2) Only 1 player who doesn't leave the game still has cash
-                    cardTable.AnnounceFinalWinner(players, 2, players.FindAll(player => player.status != PlayerStatus.quit).Find(player => player.cash > 0));
-                    nextTask = Task.GameOver;
+                    cardTable.AnnounceFinalWinner(Players, 2, Players.FindAll(player => player.status != PlayerStatus.quit).Find(player => player.cash > 0));
+                    NextTask = Task.GameOver;
                 }
                 else // There are still more than 1 players in current round and they all still have cash
                 {
-                    Player endGamePlayer = players.Find(player => player.wins == timesToWin); // Gets the player who wins enough times to end the game
+                    Player endGamePlayer = Players.Find(player => player.wins == TimesToWin); // Gets the player who wins enough times to end the game
                     if (endGamePlayer == null) // If there isn't a player who wins enough times
                     {
                         // Ask each one of the players in the current round if they want to keep playing
-                        foreach (Player p in players.FindAll(player => player.status != PlayerStatus.quit))
+                        foreach (Player p in Players.FindAll(player => player.status != PlayerStatus.quit))
                         {
                             if (!cardTable.AskNewGame(p)) // if the player don't want to keep playing, set their status as quit
                             {
@@ -196,37 +196,37 @@ namespace RaceTo21
                         }
 
                         ResetPlayers(); // reset player's cards, card points, and status
-                        if (players.FindAll(player => player.status != PlayerStatus.quit).Count <= 1) // if no more than 1 player wants to keep playing, end the game
+                        if (Players.FindAll(player => player.status != PlayerStatus.quit).Count <= 1) // if no more than 1 player wants to keep playing, end the game
                         {
                             // Card table announce the player who wins the most cash as the final winner
                             // (case 3) // No enough players
-                            cardTable.AnnounceFinalWinner(players, 3, null); 
-                            nextTask = Task.GameOver;
+                            cardTable.AnnounceFinalWinner(Players, 3, null); 
+                            NextTask = Task.GameOver;
                         }
                         else // more than 1 players wants to keep playing
                         {
                             // Reset the variable and the deck for next game
-                            currentPlayer = 0;
+                            CurrentPlayer = 0;
                             RearrangePlayers();
-                            deck = new Deck();
-                            deck.Shuffle();
+                            Deck = new Deck();
+                            Deck.Shuffle();
 
-                            nextTask = Task.IntroducePlayers; // Return to introduce phase
+                            NextTask = Task.IntroducePlayers; // Return to introduce phase
                         }
                     }
                     else
                     {
                         // Card table announce the player who wins the most cash as the final winner
                         // (case 1) Someone wins the amount of time set at the beginning
-                        cardTable.AnnounceFinalWinner(players, 1, endGamePlayer);
-                        nextTask = Task.GameOver;
+                        cardTable.AnnounceFinalWinner(Players, 1, endGamePlayer);
+                        NextTask = Task.GameOver;
                     }
                 }
             }
             else // we shouldn't get here...
             {
                 CardTable.WriteCardTableMessage("Game crashed because of unexpected issues :(");
-                nextTask = Task.GameOver;
+                NextTask = Task.GameOver;
             }
         }
 
@@ -243,7 +243,7 @@ namespace RaceTo21
                 string response = null;
                 while (int.TryParse(response, out score) == false)
                 {
-                    Console.Write("OK, what should player " + player.name + "'s score be?");
+                    Console.Write("OK, what should player " + player.Name + "'s score be?");
                     response = Console.ReadLine();
                 }
                 return score;
@@ -253,7 +253,7 @@ namespace RaceTo21
                 // loop through all the cards and sum up their values
                 foreach (Card card in player.cards)
                 {
-                    string faceValue = card.id.Remove(card.id.Length - 1); // Gets the card value from the card's short name
+                    string faceValue = card.Id.Remove(card.Id.Length - 1); // Gets the card value from the card's short name
                     switch (faceValue)
                     {
                         // K, Q, J, add 10 to score
@@ -286,7 +286,7 @@ namespace RaceTo21
             int activePlayers = 0; // Count the number of active players for every round
 
             // Loops throuh all the players who haven't quit
-            foreach (var player in players.FindAll(player => player.status != PlayerStatus.quit))
+            foreach (var player in Players.FindAll(player => player.status != PlayerStatus.quit))
             {
                 if (player.status == PlayerStatus.win) // If theres a player's status is win, there must be a winner
                 {
@@ -303,7 +303,7 @@ namespace RaceTo21
             }
 
             // If there's only 1 player isn't busted, there must be a winner
-            if (bustedPlayers == (players.FindAll(player => player.status != PlayerStatus.quit).Count - 1))
+            if (bustedPlayers == (Players.FindAll(player => player.status != PlayerStatus.quit).Count - 1))
             {
                 return true;
             }
@@ -353,7 +353,7 @@ namespace RaceTo21
                 return currentPlayers.Find(player => player.score == highScore);
             }
 
-            if (bustedPlayers == (players.Count - 1)) // If only 1 player isn't busted
+            if (bustedPlayers == (Players.Count - 1)) // If only 1 player isn't busted
             {
                 // the only player left should have a score that is less than 21 and they should be the winner
                 return currentPlayers.Find(player => player.score <= 21);
@@ -378,7 +378,7 @@ namespace RaceTo21
         /// </summary>
         public void ResetPlayers()
         {
-            foreach (Player player in players.FindAll(player => player.status != PlayerStatus.quit))
+            foreach (Player player in Players.FindAll(player => player.status != PlayerStatus.quit))
             {
                 player.cards = new List<Card>();
                 player.status = PlayerStatus.active;
@@ -393,12 +393,12 @@ namespace RaceTo21
         {
             CardTable.WriteCardTableMessage("Rearranging players order...");
             Random rng = new Random();
-            for (int i = 0; i < players.Count; i++)
+            for (int i = 0; i < Players.Count; i++)
             {
-                Player tmp = players[i];
-                int swapindex = rng.Next(players.Count);
-                players[i] = players[swapindex];
-                players[swapindex] = tmp;
+                Player tmp = Players[i];
+                int swapindex = rng.Next(Players.Count);
+                Players[i] = Players[swapindex];
+                Players[swapindex] = tmp;
             }
         }
     }

@@ -90,7 +90,7 @@ namespace RaceTo21
             for (int i = 0; i < cards.Count; i++)
             {
                 // print the index, short name, and image file name of the cards
-                Console.Write(i + ":" + cards[i].id + $"({cardImageName[cards[i].id]})"); // a list property can look like an Array!
+                Console.Write(i + ":" + cards[i].Id + $"({cardImageName[cards[i].Id]})"); // a list property can look like an Array!
                 if (i < cards.Count -1)
                 {
                     Console.Write(" ");
